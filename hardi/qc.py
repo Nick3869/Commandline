@@ -55,7 +55,7 @@ def PrepareQCsession(nrrdfilename, outDir):
     srcfilename    = os.path.join(prepDir, 'DWI_65dir/%s_DWI_65dir.src.gz' % (phan_name) )
     
     # fix the nrrd file (thickness and directions are the last dimension)
-    #hardiIO.fixNRRDfile(nrrdfilename)
+    hardiIO.fixNRRDfile(nrrdfilename)
         
     # convert to nifti + save bvecs and bvals
     hardiIO.convertToNIFTI(nrrdfilename, niifilename, bvecsfilename, bvalsfilename)
