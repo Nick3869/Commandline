@@ -1,0 +1,4 @@
+<Steps>
+  <step stage="Mandatory Parameters"><Files>/scratch/nfanjat/GUIProject/Commandline/SAMPLE_DATA/phan1_time1_chop_DWI_65dir.nrrd</Files><toStep>Whole process</toStep></step>
+  <step stage="Optional Parameters"><DTIPrep_XMLFile>Default protocol</DTIPrep_XMLFile><Mask_Use>yes</Mask_Use><method>Trilinear</method><estradX>11</estradX><estradY>11</estradY><estradZ>0</estradZ><filtradX>11</filtradX><filtradY>11</filtradY><filtradZ>0</filtradZ><NbIt>1</NbIt><minVoxEst>7</minVoxEst><minVoxFilt>7</minVoxFilt><histRes>2</histRes><minStd>0</minStd><maxStd>100</maxStd><absVal>0</absVal><imDim>3</imDim><shrinkF>3</shrinkF><bsplineFit>[1000,3]</bsplineFit><numbNeighboringDir>6</numbNeighboringDir><estradX9>2</estradX9><estradY9>2</estradY9><estradZ9>2</estradZ9><filtradX9>2</filtradX9><filtradY9>2</filtradY9><filtradZ9>2</filtradZ9></step>
+</Steps>

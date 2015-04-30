@@ -25,7 +25,7 @@ import hardi.qc as hardiQC
 
 
 # the nrrdfilename to be processed
-nrrdfilename = 'SAMPLE_DATA/phan1_time1_chop_DWI_65dir.nrrd'
+nrrdfilename = 'SAMPLE_DATA/5624895_DSI.nrrd'
 
 # where to put the processing output
 outDir       = 'SAMPLE_DATA'
@@ -41,7 +41,8 @@ STEP Zero
  
 """
 
-prepDir = hardiQC.PrepareQCsession(nrrdfilename, outDir)
+#prepDir = hardiQC.PrepareQCsession(nrrdfilename, outDir)
+prepDir = os.path.join(outDir, 'HARDIprep_QC')
 
 """
 ---------------------------------------------------------------------------------
@@ -53,8 +54,8 @@ OBJECTIVE:
     check the quality of the individual directions, e.g. missing slices, intensity artifacts, Venetian blind
 """
 
-xmlfilename = os.path.join('PROTOCOLS/IBIS_DTIPrep_PROTOCOL.xml')
-hardiQC.RunDTIPrepStage(nrrdfilename, prepDir, xmlfilename)
+xmlfilename = os.path.join('PROTOCOLS/protocol_DTIPrep1.2.3_DSI.xml')
+#hardiQC.RunDTIPrepStage(nrrdfilename, prepDir, xmlfilename)
 
 
 """

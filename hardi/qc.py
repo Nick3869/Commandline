@@ -2,7 +2,7 @@
 """
 Created on Sat Jan 10 10:00:22 2015
 
-@author: Shireen Elhabian
+@author: Shireen Elhabian, Nicolas Fanjat
 """
 
 from __future__ import division
@@ -55,7 +55,7 @@ def PrepareQCsession(nrrdfilename, outDir):
     srcfilename    = os.path.join(prepDir, 'DWI_65dir/%s_DWI_65dir.src.gz' % (phan_name) )
     
     # fix the nrrd file (thickness and directions are the last dimension)
-    hardiIO.fixNRRDfile(nrrdfilename)
+    #hardiIO.fixNRRDfile(nrrdfilename)
         
     # convert to nifti + save bvecs and bvals
     hardiIO.convertToNIFTI(nrrdfilename, niifilename, bvecsfilename, bvalsfilename)
@@ -134,7 +134,7 @@ def PerformWithinGradientMotionQC(nrrdfilename, prepDir):
     _ , filename = ntpath.split(nrrdfilename)
     basename     = filename[:-len('.nrrd')]
     
-    nrrdfilename = os.path.join(prepDir, 'DWI_65dir/%s_QCed.nrrd' % (basename) )    
+    nrrdfilename = os.path.join(prepDir, 'DWI_65dir/%s_DWI_65dir_QCed.nrrd' % (basename) )    
         
     reportfilename               = os.path.join(prepDir, 'DWI_65dir/%s_QCed_WithinGradientMotionQCreport.txt' %(basename))
     nrrdfilename_new             = os.path.join(prepDir, 'DWI_65dir/%s_QCed_WithinGradientMotionQCed.nrrd' %(basename))
@@ -288,7 +288,7 @@ TODO:
     (5) save as nrrd, nii and other formats
 """
 
-def PerformResampleCorruptedSlicesInQspaceAndGradientDenoise(nrrdfilename, prepDir):
+def PerformResampleCorruptedSlicesInQspaceAndGradientDenoise(nrrdfilename, prepDir, optionsf4):
     
     start_time = time.time()
     
@@ -298,19 +298,19 @@ def PerformResampleCorruptedSlicesInQspaceAndGradientDenoise(nrrdfilename, prepD
     # DTIPrep has problem in calling the denoising filter, so the QCed nrrd is not actually denoised
     
     # filter parameters - gradient-wise denoising
-    EstimationRadius_x        = 11 
-    EstimationRadius_y        = 11 
-    EstimationRadius_z        = 0
-    FilteringRadius_x         = 11  
-    FilteringRadius_y         = 11  
-    FilteringRadius_z         = 0
-    NoOfIterations            = 1
-    minVoxelsFiltering        = 7
-    minVoxelsEstimation       = 7
-    histRes                   = 2
-    minStd                    = 0
-    maxStd                    = 100
-    absVal                    = 0 
+    EstimationRadius_x        = optionsf4[0] 
+    EstimationRadius_y        = optionsf4[1] 
+    EstimationRadius_z        = optionsf4[2]
+    FilteringRadius_x         = optionsf4[3]  
+    FilteringRadius_y         = optionsf4[4] 
+    FilteringRadius_z         = optionsf4[5]
+    NoOfIterations            = optionsf4[6]
+    minVoxelsFiltering        = optionsf4[7]
+    minVoxelsEstimation       = optionsf4[8]
+    histRes                   = optionsf4[9]
+    minStd                    = optionsf4[10]
+    maxStd                    = optionsf4[11]
+    absVal                    = optionsf4[12]
     
     nrrdfilename_orig            = os.path.join(prepDir, 'DWI_65dir/%s.nrrd' % (basename) )    
     niifilename_orig             = os.path.join(prepDir, 'DWI_65dir/%s.nii' %(basename) )    
@@ -574,15 +574,15 @@ TODO:
     (3) back to nrrd format, nii and src
 """
 
-def PerformModelBasedReferenceMotionCorrectionMCFLIRT12DOF(nrrdfilename, prepDir):
+def PerformModelBasedReferenceMotionCorrectionMCFLIRT12DOF(nrrdfilename, prepDir, optionsmc):
     
     start_time = time.time()
     
     _ , filename = ntpath.split(nrrdfilename)
     basename     = filename[:-len('.nrrd')]
     
-    interpMethod  = 'trilinear'
-    useBrainMask  = True # false if we have severe motion (> 5deg), otherwise try to avoid background noise when doing motion correction
+    interpMethod  = optionsmc[1]
+    useBrainMask  = optionsmc[0] == "yes" # false if we have severe motion (> 5deg), otherwise try to avoid background noise when doing motion correction
     
     nrrdfilename              = os.path.join(prepDir, 'DWI_65dir/%s_QCed_WithinGradientMotionQCed_ResampleQ.nrrd' % (basename) )    
     niifilename               = os.path.join(prepDir, 'DWI_65dir/%s_QCed_WithinGradientMotionQCed_ResampleQ.nii' % (basename) )    
@@ -812,7 +812,7 @@ TODO:
     (1) compute the bias field
     (2) apply bias field correction on all the gradients, do this on the masked and unmasked MC data
 """
-def PerformBiasFieldCorrection(nrrdfilename, prepDir):
+def PerformBiasFieldCorrection(nrrdfilename, prepDir, optionsb):
     
     start_time = time.time()
     
@@ -835,7 +835,7 @@ def PerformBiasFieldCorrection(nrrdfilename, prepDir):
     btablefilename_MC_masked_BFC            = os.path.join(prepDir, 'DWI_65dir/%s_QCed_WithinGradientMotionQCed_ResampleQ_MODELBASED_MCFLIRT12DOF_masked_BFC_btable.txt' %(basename) )    
     srcfilename_MC_masked_BFC               = os.path.join(prepDir, 'DWI_65dir/%s_QCed_WithinGradientMotionQCed_ResampleQ_MODELBASED_MCFLIRT12DOF_masked_BFC.src.gz' %(basename) )    
     
-    cmdStr = 'DWIBiasFieldCorrection --image-dimensionality 3 --input-image %s --mask-image %s --shrink-factor 1  --output [%s, %s] --bspline-fitting [1000,3]' % (baselineNiifilename, niiBrainMaskFilename, baselineCorrectedNiifilename, biasfieldNiifilename)
+    cmdStr = 'DWIBiasFieldCorrection --image-dimensionality %i --input-image %s --mask-image %s --shrink-factor %d  --output [%s, %s] --bspline-fitting %s' % (optionsb[0], baselineNiifilename, niiBrainMaskFilename, optionsb[1], baselineCorrectedNiifilename, biasfieldNiifilename, optionsb[2])
     os.system(cmdStr)
     
     biasfield               = nib.load(biasfieldNiifilename).get_data()
@@ -880,7 +880,7 @@ Assumptions:
 TODO: 
     (1) jointly denoise the bias field corrected data
 """    
-def PerformJointLMMSEDenoising(nrrdfilename, prepDir):
+def PerformJointLMMSEDenoising(nrrdfilename, prepDir, optionsf9):
     
     start_time = time.time()
     
@@ -888,13 +888,13 @@ def PerformJointLMMSEDenoising(nrrdfilename, prepDir):
     basename     = filename[:-len('.nrrd')]
     
     # filter parameters
-    NoOfNeighboringDirections = 6 # when using all, too smooth diffusion
-    EstimationRadius_x        = 2 
-    EstimationRadius_y        = 2 
-    EstimationRadius_z        = 2
-    FilteringRadius_x         = 2  
-    FilteringRadius_y         = 2  
-    FilteringRadius_z         = 2  
+    NoOfNeighboringDirections = optionsf9[0] # when using all, too smooth diffusion
+    EstimationRadius_x        = optionsf9[1] 
+    EstimationRadius_y        = optionsf9[2] 
+    EstimationRadius_z        = optionsf9[3]
+    FilteringRadius_x         = optionsf9[4]  
+    FilteringRadius_y         = optionsf9[5]  
+    FilteringRadius_z         = optionsf9[6]  
     
     nrrdfilename_MC_masked_BFC                     = os.path.join(prepDir, 'DWI_65dir/%s_QCed_WithinGradientMotionQCed_ResampleQ_MODELBASED_MCFLIRT12DOF_masked_BFC.nrrd' %(basename) )    
                     
@@ -1165,4 +1165,10 @@ def PerformFullBrainTractography(nrrdfilename, prepDir):
     end_time = time.time()
     
     print 'PerformFullBrainTractography: time elapsed = %f seconds ...' % (end_time - start_time)
+    
+def num(s):
+    try:
+        return int(s)
+    except ValueError:
+        return float(s)
  
